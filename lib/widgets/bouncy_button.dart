@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class BouncyCTAButton extends StatefulWidget {
   final VoidCallback onTap;
-  const BouncyCTAButton({super.key, required this.onTap});
+  final String label;
+  const BouncyCTAButton({super.key, required this.onTap, required this.label});
 
   @override
   State<BouncyCTAButton> createState() => _BouncyCTAButtonState();
@@ -16,9 +17,8 @@ class _BouncyCTAButtonState extends State<BouncyCTAButton> with SingleTickerProv
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
-    _scale = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    // Task 2B: ElasticOut creates the "overshoot" effect
+    _scale = Tween<double>(begin: 1.0, end: 0.9).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
   }
 
   @override
@@ -32,9 +32,10 @@ class _BouncyCTAButtonState extends State<BouncyCTAButton> with SingleTickerProv
       child: ScaleTransition(
         scale: _scale,
         child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(30)),
-          child: const Text("Continue to Onboarding", style: TextStyle(color: Colors.white)),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(12)),
+          child: Text(widget.label, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ),
     );

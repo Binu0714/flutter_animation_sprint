@@ -9,25 +9,16 @@ class LoadingSpinner extends StatefulWidget {
 
 class _SpinnerState extends State<LoadingSpinner> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _rotation;
-  late Animation<Color?> _colorAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200), // Requirement
-    )..repeat();
-
-    _rotation = Tween<double>(begin: 0, end: 2 * pi).animate(_controller);
-
-    _colorAnimation = ColorTween(begin: Colors.blue, end: Colors.purple).animate(_controller);
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // Requirement: NEVER FORGET
+    _controller.dispose();
     super.dispose();
   }
 
@@ -36,24 +27,31 @@ class _SpinnerState extends State<LoadingSpinner> with SingleTickerProviderState
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return CustomPaint(
-          painter: SpinnerPainter(_rotation.value, _colorAnimation.value!),
-          size: const Size(50, 50),
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Transform.rotate(
+              angle: _controller.value * 2 * pi,
+              child: CustomPaint(painter: ArcPainter(), size: const Size(50, 50)),
+            ),
+            // Pulsing Dot
+            Container(
+              width: 10 + (5 * sin(_controller.value * 2 * pi)),
+              height: 10 + (5 * sin(_controller.value * 2 * pi)),
+              decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+            ),
+          ],
         );
       },
     );
   }
 }
 
-class SpinnerPainter extends CustomPainter {
-  final double rotation;
-  final Color color;
-  SpinnerPainter(this.rotation, this.color);
-
+class ArcPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color..strokeWidth = 4..style = PaintingStyle.stroke;
-    canvas.drawArc(Rect.fromLTWH(0, 0, size.width, size.height), rotation, 2, false, paint);
+    final paint = Paint()..color = Colors.blue..strokeWidth = 4..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
+    canvas.drawArc(Rect.fromLTWH(0, 0, size.width, size.height), 0, 1.5, false, paint);
   }
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
